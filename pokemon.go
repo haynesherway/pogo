@@ -14,7 +14,7 @@ import (
 const (
     POKEMON_FILE = "json/pokemon.json"
     MOVES_FILE = "json/move.json"
-    TYPES_FILE = "json/types.json"
+    TYPES_FILE = "json/type.json"
 )
 
 // Errors
