@@ -62,8 +62,8 @@ func TestPokemon_GetMaxCP(t *testing.T) {
 			t.Error("Unable to get pokemon")
 			return
 		}
-		maxcp = p.GetMaxCP()
-		if maxcp != p.maxcp {
+		maxcp := p.GetMaxCP()
+		if maxcp != pokemon.maxcp {
 			t.Error(
 			"For", pokemon.input,
 			"expected", pokemon.maxcp,
