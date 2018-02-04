@@ -6,14 +6,15 @@ import (
 )
 
 type testMon struct {
+	input string
 	name string
 }
 
 var testMons = []testMon{
-	{"rayquaza"},
-	{"Regirock"},
-	{"mewtwo"},
-	{"weedle"},
+	{"rayquaza", "Rayquaza"},
+	{"Regirock", "Regirock"},
+	{"mewtwo", "Mewtwo"},
+	{"weedle", "Weedle"},
 }
 
 func TestGetPokemon(t *testing.T) {
@@ -21,13 +22,13 @@ func TestGetPokemon(t *testing.T) {
 		p, err := GetPokemon(pokemon.name)
 		if err != nil {
 			t.Error(
-			"For", pokemon.name,
+			"For", pokemon.input,
 			"expected", pokemon.name,
 			"got", err.Error())
 		}
 		if pokemon.name != p.Name {
 			t.Error(
-			"For", pokemon.name,
+			"For", pokemon.input,
 			"expected", pokemon.name,
 			"got", p.Name)
 		}
