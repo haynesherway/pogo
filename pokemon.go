@@ -57,6 +57,15 @@ func (p *Pokemon) GetMaxCP() (cp int) {
     return p.MaxCP
 }
 
+func (p *Pokemon) GetCP(level float64, ivAttack int, ivDefense int, ivStamina int) (cp int){
+    attack := getStatValue(p.Stats.BaseAttack, ivAttack, level)
+    defense := getStatValue(p.Stats.BaseDefense, ivDefense, level)
+    stamina := getStatValue(p.Stats.BaseStamina, ivStamina, level) 
+    
+    cp = calculateCP(attack, defense, stamina, level)
+    return
+}
+
 func (p *Pokemon) GetRaidCPChart() (string) {
     possibleIVs := []int{15,14,13,12,11,10}
 
@@ -238,26 +247,6 @@ func (p *Pokemon) GetRaidIV(raidcp int) (string) {
     
     return message + strings.Join(chart, "\n")
 }
-
-/*func (p *Pokemon) GetCP(level int, ivAttack int, ivDefense int, ivStamina int) (cp int){
-    attack := GetStatValue(p.Stats.BaseAttack, ivAttack, level)
-    defense := GetStatValue(p.Stats.BaseDefense, ivDefense, level)
-    stamina := GetStatValue(p.Stats.BaseStamina, ivStamina, level) 
-    
-    cp = CalculateCP(attack, defense, stamina, level)
-    return
-}*/
-
-func (p *Pokemon) GetCP(level float64, ivAttack int, ivDefense int, ivStamina int) (cp int){
-    attack := GetStatValue(p.Stats.BaseAttack, ivAttack, level)
-    defense := GetStatValue(p.Stats.BaseDefense, ivDefense, level)
-    stamina := GetStatValue(p.Stats.BaseStamina, ivStamina, level) 
-    
-    cp = CalculateCP(attack, defense, stamina, level)
-    return
-}
-
-
 
 func (p *Pokemon) GetTypeRelations() (relations map[string]map[string]float64) {
     relations = make(map[string]map[string]float64)

@@ -126,13 +126,13 @@ var multiplierMap = map[float64]float64{
 	40.0:	0.79030001,
 }
 
-func GetStatValue(base int, iv int, level float64) (value float64) {
+func getStatValue(base int, iv int, level float64) (value float64) {
 		value = (float64(base) + float64(iv))
 	
 	return
 }
 
-func CalculateCP(attack float64, defense float64, stamina float64, level float64) (cp int) {
+func calculateCP(attack float64, defense float64, stamina float64, level float64) (cp int) {
 	if multiplier, ok := multiplierMap[level]; ok {
 		cp = int((attack * math.Pow(defense, 0.5) * math.Pow(stamina, 0.5) * math.Pow(multiplier, 2)) / 10)
 	}
@@ -140,19 +140,6 @@ func CalculateCP(attack float64, defense float64, stamina float64, level float64
 	    cp = 10
 	}
 	return
-}
-
-func PrintToDiscord(s *discordgo.Session, m *discordgo.MessageCreate, fields []string) error {
-	if len(fields) < 2 {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "CP command should be in the following format: !cp mewtwo")
-
-		return nil
-	}
-
-	//pokemon := fields[1]
-
-	return nil
-
 }
 
 type by func(s1, s2 *ivStat) bool

@@ -82,3 +82,15 @@ func ExamplePokemon_GetMaxCP() {
 	// Output:
 	// Max CP for Weedle is 397
 }
+
+func TestPokemon_GetCP() {
+	pokemon, err := GetPokemon("groudon")
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		cp := pokemon.GetCP(20, 15, 14, 15)
+		fmt.Println("CP for Groudon at level 20 with 15/14/15 IVs is", cp)
+	}
+	// Output:
+	// CP for Groudon at level 20 with 15/14/15 IVs is 2323
+}
