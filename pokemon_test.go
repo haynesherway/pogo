@@ -80,5 +80,5 @@ func ExamplePokemon_GetMaxCP() {
 		fmt.Println("Max CP for Weedle is", pokemon.GetMaxCP())
 	}
 	// Output:
-	// 397
+	// Max CP for Weedle is 397
 }
