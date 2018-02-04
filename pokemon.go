@@ -120,12 +120,12 @@ func (p *Pokemon) getIV(stats *ivStat) (string) {
         if _, ok := StardustMap[stats.Stardust]; ok {
             possibleLevels = StardustMap[stats.Stardust]
         } else {
-           for k := range NewMultiplierMap {
+           for k := range multiplierMap {
                 possibleLevels = append(possibleLevels, k)
             } 
         }
     } else {
-        for k := range NewMultiplierMap {
+        for k := range multiplierMap {
             possibleLevels = append(possibleLevels, k)
         }
     }

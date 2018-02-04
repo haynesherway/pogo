@@ -1,3 +1,5 @@
+[![GoDoc](http://godoc.org/github.com/haynesherway/pogo?status.svg)](http://godoc.org/github.com/haynesherway/pogo)
+
 # Installation
 >go get github.com/haynesherway/pogo
 
