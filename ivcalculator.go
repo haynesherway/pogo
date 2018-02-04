@@ -134,8 +134,7 @@ func (ivCalc *IVCalculation) AskQuestion() {
             ivCalc.PrintToDiscord("Enter pokemon name.")
         case status_got_pokemon:
             ivCalc.PrintToDiscord("Enter CP.")
-        case status_got_cp
-:
+        case status_got_cp:
             ivCalc.PrintToDiscord("Enter level.")
             
     }
