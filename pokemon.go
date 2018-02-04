@@ -23,10 +23,7 @@ const (
 
 var pokemonMap map[string]Pokemon
 
-type pokemonList struct {
-    Pokemons []*Pokemon
-}
-
+// Pokemon is a resource representing a single pokemon
 type Pokemon struct {
     Name        string `json:"name"`
     ID          string `json:"id"`
@@ -37,19 +34,26 @@ type Pokemon struct {
     MaxCP       int `json:"maxCP"`
 }
 
+// PokemonStats is a resource representing base stats for a pokemon
 type PokemonStats struct {
     BaseStamina     int `json:"baseStamina"`
     BaseAttack      int `json:"baseAttack"`
     BaseDefense     int `json:"baseDefense"`
 }
 
-// GetPokemon retures a 
+// GetPokemon retures a Pokemon of a
 func GetPokemon(pokemonName string) (*Pokemon, error) {
+    pokemonName = strings.ToLower(pokemonName)
     if p, ok := pokemonMap[pokemonName]; ok {
         return p, nil
     } else {
         return nil, ERR_NOT_FOUND
     }
+}
+
+// GetMaxCP returns the maximum CP of a pokemon
+func (p *Pokemon) GetMaxCP() (cp int) {
+    return p.MaxCP
 }
 
 func (p *Pokemon) GetRaidCPChart() (string) {
@@ -252,12 +256,7 @@ func (p *Pokemon) GetCP(level float64, ivAttack int, ivDefense int, ivStamina in
     return
 }
 
-func (p *Pokemon) GetMaxCP() (cp int) {
-    if p.Stats.BaseAttack == 1 && p.Stats.BaseDefense == 1 && p.Stats.BaseStamina == 1 {
-        return 0
-    }
-    return p.GetCP(40.0, 15, 15, 15)
-}
+
 
 func (p *Pokemon) GetTypeRelations() (relations map[string]map[string]float64) {
     relations = make(map[string]map[string]float64)
@@ -396,7 +395,7 @@ func PrintWeaknessToDiscord(s *discordgo.Session, m *discordgo.MessageCreate, fi
 } */
 
 func init() {
-    PokemonMap = make(map[string]Pokemon)
+    pokemonMap = make(map[string]Pokemon)
     
     //Pokemon
     file, err := ioutil.ReadFile(POKEMON_FILE)
@@ -413,7 +412,7 @@ func init() {
 	}
 	
 	for _, poke := range pokemonList {
-	    PokemonMap[strings.ToLower(poke.Name)] = poke
+	    pokemonMap[strings.ToLower(poke.Name)] = poke
 	}
 	
     return
