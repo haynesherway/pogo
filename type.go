@@ -7,12 +7,8 @@ import (
     "strings"
 )
 
-const (
-    TYPES_FILE = "type.json"
-)
-
-var TypeMap = map[string]Type{}
-var Type2ID= map[string]string{}
+var typeMap = map[string]Type{}
+var typeToID = map[string]string{}
 
 type Type struct {
     ID      string `json:"id"`
@@ -94,10 +90,10 @@ func (t *Type) PrintTypeChart() string {
 
 func GetAttackTypeScalars(id string) (map[string]float64) {
     typeScalars := map[string]float64{}
-    if ty, ok := TypeMap[id]; ok {
+    if ty, ok := typeMap[id]; ok {
     
         for _, damage := range ty.Damage {
-            typeScalars[TypeMap[damage.ID].Name] = damage.Scalar
+            typeScalars[typeMap[damage.ID].Name] = damage.Scalar
         }
     }
     
@@ -105,12 +101,12 @@ func GetAttackTypeScalars(id string) (map[string]float64) {
 }
 
 func GetDefenseTypeScalars(id string) (map[string]float64) {
-    if _, ok := TypeMap[id]; !ok {
+    if _, ok := typeMap[id]; !ok {
         return nil
     } 
     
     typeScalars := map[string]float64{}
-    for _, ty := range TypeMap {
+    for _, ty := range typeMap {
         for _, typeDamage := range ty.Damage {
             if typeDamage.ID == id {
                 typeScalars[ty.Name] = typeDamage.Scalar
@@ -122,7 +118,7 @@ func GetDefenseTypeScalars(id string) (map[string]float64) {
 }
 
 func init() {
-    TypeMap = make(map[string]Type)
+    typeMap = make(map[string]Type)
     
     //Types
 	file, err := ioutil.ReadFile(TYPES_FILE)
@@ -139,7 +135,7 @@ func init() {
 	}
 	
 	for _, ty := range typeList {
-	    TypeMap[ty.ID] = ty
-	    Type2ID[strings.ToLower(ty.Name)] = ty.ID
+	    typeMap[ty.ID] = ty
+	    typeToID[strings.ToLower(ty.Name)] = ty.ID
 	}
 }

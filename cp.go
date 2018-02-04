@@ -21,7 +21,7 @@ type ivStat struct {
 	Best string
 }
 
-var StardustMap = map[int][]float64{
+var stardustMap = map[int][]float64{
     200: {1.0,1.5,2.0,2.5},
     400: {3.0,3.5,4.0,4.5},
 	600: {5.0,5.5,6.0,6.5},
@@ -44,7 +44,7 @@ var StardustMap = map[int][]float64{
 	10000: {39.0,39.5},
 }
 
-var NewMultiplierMap = map[float64]float64{
+var multiplierMap = map[float64]float64{
 	1.0:	0.094,
 	1.5:    0.135137432,
 	2.0:	0.16639787,
@@ -126,49 +126,6 @@ var NewMultiplierMap = map[float64]float64{
 	40.0:	0.79030001,
 }
 
-var MultiplierMap = map[int]float64{
-1:	0.094,
-2:	0.16639787,
-3:	0.21573247,
-4:	0.25572005,
-5:	0.29024988,
-6:	0.3210876,
-7:	0.34921268,
-8:	0.37523559,
-9:	0.39956728,
-10:	0.42250001,
-11:	0.44310755,
-12:	0.46279839,
-13:	0.48168495,
-14:	0.49985844,
-15:	0.51739395,
-16:	0.53435433,
-17:	0.55079269,
-18:	0.56675452,
-19:	0.58227891,
-20:	0.59740001,
-21:	0.61215729,
-22:	0.62656713,
-23:	0.64065295,
-24:	0.65443563,
-25:	0.667934,
-26:	0.68116492,
-27:	0.69414365,
-28:	0.70688421,
-29:	0.71939909,
-30:	0.7317,
-31:	0.73776948,
-32:	0.74378943,
-33:	0.74976104,
-34:	0.75568551,
-35:	0.76156384,
-36:	0.76739717,
-37:	0.7731865,
-38:	0.77893275,
-39:	0.78463697,
-40:	0.79030001,
-}
-
 func GetStatValue(base int, iv int, level float64) (value float64) {
 		value = (float64(base) + float64(iv))
 	
@@ -176,7 +133,7 @@ func GetStatValue(base int, iv int, level float64) (value float64) {
 }
 
 func CalculateCP(attack float64, defense float64, stamina float64, level float64) (cp int) {
-	if multiplier, ok := NewMultiplierMap[level]; ok {
+	if multiplier, ok := multiplierMap[level]; ok {
 		cp = int((attack * math.Pow(defense, 0.5) * math.Pow(stamina, 0.5) * math.Pow(multiplier, 2)) / 10)
 	}
 	if cp < 10 {

@@ -10,20 +10,14 @@ import (
 )
 
 const (
-    STATUS_STARTING int = iota
-    STATUS_EXPECTING_POKEMON 
-    STATUS_GOT_POKEMON
-    STATUS_EXPECTING_CP
-    STATUS_GOT_CP
-    /*STATUS_EXPECTING_STARDUST
-    STATUS_GOT_STARDUST
-    STATUS_EXPECTING_BEST
-    STATUS_GOT_BEST
-    STATUS_EXPECTING_TIER
-    STATUS_GOT_TIER*/
-    STATUS_EXPECTING_LEVEL
-    STATUS_CALCULATING
-    STATUS_DONE
+    status_startiing int = iota
+    status_expecting_pokemon 
+    status_got_pokemon
+    status_expecting_cp
+    status_got_cp
+    status_expecting_level
+    status_calculating
+    status_done
 )
 
 type IVCalculator struct {
@@ -59,7 +53,7 @@ func StartIVCalculator(s *discordgo.Session) (*IVCalculator) {
                     ivCalculator.Start(m)
                 } else {
                     ivCalc := ivCalculator.GetCalculation(m.Author.ID)
-                    if ivCalc.Status == STATUS_DONE {
+                    if ivCalc.Status == status_done {
                         ivCalculator.Stop(m.Author.ID)
                         ivCalculator.Start(m)
                     } else if ivCalc.ChannelID == m.ChannelID {
@@ -95,7 +89,7 @@ func (calc *IVCalculator) Start(m *discordgo.MessageCreate) {
                     }
                     
                 case <-timeout:
-                    if thisCalculation.Status == STATUS_DONE {
+                    if thisCalculation.Status == status_done {
                         //YAY it completed sucessfully
                     } else {
                         thisCalculation.PrintToDiscord("Unable to process your IV Calculation, please try again.")
@@ -136,11 +130,12 @@ func (calc *IVCalculator) GetCalculation(userID string) (*IVCalculation) {
 func (ivCalc *IVCalculation) AskQuestion() {
     
     switch ivCalc.Status {
-        case STATUS_STARTING:
+        case status_startiing:
             ivCalc.PrintToDiscord("Enter pokemon name.")
-        case STATUS_GOT_POKEMON:
+        case status_got_pokemon:
             ivCalc.PrintToDiscord("Enter CP.")
-        case STATUS_GOT_CP:
+        case status_got_cp
+:
             ivCalc.PrintToDiscord("Enter level.")
             
     }
@@ -153,7 +148,7 @@ func (ivCalc *IVCalculation) AskQuestion() {
 func (ivCalc *IVCalculation) GetResponse(m string) {
     
     switch ivCalc.Status {
-    case STATUS_EXPECTING_POKEMON:
+    case status_expecting_pokemon:
         if p, ok := PokemonMap[strings.ToLower(m)]; ok {
             ivCalc.Pokemon = &p
             ivCalc.Status++
@@ -161,7 +156,7 @@ func (ivCalc *IVCalculation) GetResponse(m string) {
         } else {
             ivCalc.PrintToDiscord("Unrecognized pokemon. Try again.")
         }
-    case STATUS_EXPECTING_CP:
+    case status_expecting_cp:
         if cp, err := strconv.Atoi(m); err == nil {
             ivCalc.IV.CP = cp
             ivCalc.Status++
@@ -169,7 +164,7 @@ func (ivCalc *IVCalculation) GetResponse(m string) {
         } else {
             ivCalc.PrintToDiscord(fmt.Sprintf("CP must be an integer, got %s. Try again.", m))
         }
-    case STATUS_EXPECTING_LEVEL:
+    case status_expecting_level:
         if lvl, err := strconv.ParseFloat(m, 64); err == nil {
             ivCalc.IV.Level = lvl
             ivCalc.Status++
@@ -178,7 +173,7 @@ func (ivCalc *IVCalculation) GetResponse(m string) {
         }
     }
     
-    if ivCalc.Status == STATUS_CALCULATING {
+    if ivCalc.Status == status_calculating {
         ivCalc.Calculate()
     }
     
