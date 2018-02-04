@@ -1,27 +1,29 @@
+// Package pogo provides functions to get different types of stats for Pokemon Go
 package pogo
 
 import (
 	"encoding/json"
-	//"errors"
 	"fmt"
-	//"github.com/argandas/gokemon"
 	"io/ioutil"
-	//"log"
-	//"net/http"
-	//"github.com/bwmarrin/discordgo"
 	"sort"
 	"strings"
-	//"strconv"
 )
 
+// Locations of the json files
 const (
     POKEMON_FILE = "pokemon.json"
     MOVES_FILE = "move.json"
+    TYPES_FILE = "types.json"
 )
 
-var PokemonMap map[string]Pokemon
+// Errors
+const (
+    ERR_NOT_FOUND = errors.New("Pokemon not found.")
+)
 
-type PokemonList struct {
+var pokemonMap map[string]Pokemon
+
+type pokemonList struct {
     Pokemons []*Pokemon
 }
 
@@ -33,7 +35,6 @@ type Pokemon struct {
     Stats       PokemonStats `json:"stats"`
     Moves
     MaxCP       int `json:"maxCP"`
-    CPData
 }
 
 type PokemonStats struct {
@@ -42,13 +43,13 @@ type PokemonStats struct {
     BaseDefense     int `json:"baseDefense"`
 }
 
-type CPData struct {
-    Max20 int
-    Max25 int
-    Min20 int
-    Min25 int
-    Max40 int
-    Min40 int
+// GetPokemon retures a 
+func GetPokemon(pokemonName string) (*Pokemon, error) {
+    if p, ok := pokemonMap[pokemonName]; ok {
+        return p, nil
+    } else {
+        return nil, ERR_NOT_FOUND
+    }
 }
 
 func (p *Pokemon) GetRaidCPChart() (string) {
