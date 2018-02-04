@@ -83,7 +83,7 @@ func ExamplePokemon_GetMaxCP() {
 	// Max CP for Weedle is 397
 }
 
-func TestPokemon_GetCP() {
+func ExamplePokemon_GetCP() {
 	pokemon, err := GetPokemon("groudon")
 	if err != nil {
 		fmt.Println(err.Error())
