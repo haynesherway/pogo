@@ -18,7 +18,7 @@ const (
 )
 
 // Errors
-const (
+var (
     ERR_NOT_FOUND = errors.New("Pokemon not found.")
 )
 
@@ -46,7 +46,7 @@ type PokemonStats struct {
 func GetPokemon(pokemonName string) (*Pokemon, error) {
     pokemonName = strings.ToLower(pokemonName)
     if p, ok := pokemonMap[pokemonName]; ok {
-        return p, nil
+        return &p, nil
     } else {
         return nil, ERR_NOT_FOUND
     }
@@ -122,8 +122,8 @@ func (p *Pokemon) getIV(stats *ivStat) (string) {
     if stats.Level != 0.0 {
         possibleLevels = append(possibleLevels, stats.Level)
     } else if stats.Stardust != 0 {
-        if _, ok := StardustMap[stats.Stardust]; ok {
-            possibleLevels = StardustMap[stats.Stardust]
+        if _, ok := stardustMap[stats.Stardust]; ok {
+            possibleLevels = stardustMap[stats.Stardust]
         } else {
            for k := range multiplierMap {
                 possibleLevels = append(possibleLevels, k)

@@ -1,19 +1,22 @@
 package pogo
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type testMon struct {
 	name string
 }
 
-var testMons = []testMons{
+var testMons = []testMon{
 	{"rayquaza"},
 	{"Regirock"},
 	{"mewtwo"},
 	{"weedle"},
 }
 
-func TestGetPokemon(*testing.T) {
+func TestGetPokemon(t *testing.T) {
 	for _, pokemon := range testMons {
 		p, err := GetPokemon(pokemon.name)
 		if err != nil {

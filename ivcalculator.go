@@ -148,7 +148,7 @@ func (ivCalc *IVCalculation) GetResponse(m string) {
     
     switch ivCalc.Status {
     case status_expecting_pokemon:
-        if p, ok := PokemonMap[strings.ToLower(m)]; ok {
+        if p, ok := pokemonMap[strings.ToLower(m)]; ok {
             ivCalc.Pokemon = &p
             ivCalc.Status++
             ivCalc.AskQuestion()
