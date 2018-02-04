@@ -46,9 +46,9 @@ func ExampleGetPokemon() {
 		}
 	}
 	// Output:
-	// rayquaza
+	// Rayquaza
 	// Regirock
-	// mewtwo
-	// weedle
+	// Mewtwo
+	// Weedle
 	// Pokemon not found.
 }
