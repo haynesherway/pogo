@@ -12,9 +12,9 @@ import (
 
 // Locations of the json files
 const (
-    POKEMON_FILE = "pokemon.json"
-    MOVES_FILE = "move.json"
-    TYPES_FILE = "types.json"
+    POKEMON_FILE = "json/pokemon.json"
+    MOVES_FILE = "json/move.json"
+    TYPES_FILE = "json/types.json"
 )
 
 // Errors
