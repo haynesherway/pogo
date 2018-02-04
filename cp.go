@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	
-	"github.com/bwmarrin/discordgo"
 )
 
 type ivStat struct {
