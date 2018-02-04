@@ -3,7 +3,7 @@ package pogo
 import "testing"
 
 type testMon struct {
-	name
+	name string
 }
 
 var testMons = []testMons{

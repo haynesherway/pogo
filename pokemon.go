@@ -3,6 +3,7 @@ package pogo
 
 import (
 	"encoding/json"
+    "errors"
 	"fmt"
 	"io/ioutil"
 	"sort"
