@@ -155,9 +155,9 @@ func PrintToDiscord(s *discordgo.Session, m *discordgo.MessageCreate, fields []s
 
 }
 
-type By func(s1, s2 *ivStat) bool
+type by func(s1, s2 *ivStat) bool
 
-func (by By) Sort(stats []ivStat) {
+func (by by) Sort(stats []ivStat) {
 	ss := &statSorter{
 		stats: stats,
 		by: by,
@@ -205,7 +205,7 @@ func SortChart(stats []ivStat) []ivStat {
 		return s1.Level > s2.Level
 	}
 	
-	By(sort).Sort(stats)
+	by(sort).Sort(stats)
 	return stats
 }
 
