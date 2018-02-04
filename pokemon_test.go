@@ -55,7 +55,7 @@ func ExampleGetPokemon() {
 	// Pokemon not found.
 }
 
-func TestGetMaxCP(t *testing.T) {
+func TestPokemon_GetMaxCP(t *testing.T) {
 	for _, pokemon := range testMons {
 		p, err := GetPokemon(pokemon.input)
 		if err != nil {
@@ -72,7 +72,7 @@ func TestGetMaxCP(t *testing.T) {
 	}
 }
 
-func ExampleGetMaxCP() {
+func ExamplePokemon_GetMaxCP() {
 	pokemon, err := GetPokemon("weedle")
 	if err != nil {
 		fmt.Println(err.Error())
