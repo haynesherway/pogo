@@ -1,4 +1,4 @@
-package pokemon
+package pogo
 
 import (
 	"encoding/json"
