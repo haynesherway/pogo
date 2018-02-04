@@ -41,7 +41,7 @@ type PokemonStats struct {
     BaseDefense     int `json:"baseDefense"`
 }
 
-// GetPokemon retures a Pokemon of a
+// GetPokemon returns a Pokemon resource
 func GetPokemon(pokemonName string) (*Pokemon, error) {
     pokemonName = strings.ToLower(pokemonName)
     if p, ok := pokemonMap[pokemonName]; ok {

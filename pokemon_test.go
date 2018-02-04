@@ -32,6 +32,7 @@ func TestGetPokemon(*testing.T) {
 }
 
 func ExampleGetPokemon() {
+	exampleMons := []string{"rayquaza", "Regirock", "mewtwo", "weedle", "nokemon"}
 	for _, pokemonName := range exampleMons {
 		p, err := GetPokemon(pokemonName)
 		if err != nil {
@@ -45,4 +46,5 @@ func ExampleGetPokemon() {
 	// Regirock
 	// mewtwo
 	// weedle
+	// Pokemon not found.
 }
