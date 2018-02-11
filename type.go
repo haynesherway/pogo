@@ -5,8 +5,6 @@ import (
     "errors"
     "fmt"
     "io/ioutil"
-    "path"
-    "runtime"
     "strings"
 )
 
@@ -132,12 +130,6 @@ func GetDefenseTypeScalars(id string) (map[string]float64) {
 
 func init() {
     typeMap = make(map[string]Type)
-    
-    _, filename, _, ok := runtime.Caller(1)
-	if !ok {
-	    return
-	}
-	JSON_LOCATION := path.Join(path.Dir(filename), "./json/")
     
     //Types
 	file, err := ioutil.ReadFile(JSON_LOCATION+TYPES_FILE)

@@ -7,8 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"path"
-	"runtime"
+    "os"
 	"sort"
 	"strings"
 )
@@ -17,6 +16,7 @@ const POKE_API = "http://pokeapi.co/api/v2/"
 
 // Locations of the json files
 var (
+    JSON_LOCATION = os.Getenv("GOPATH") + "/src/github.com/haynesherway/pogo/json/"
     POKEMON_FILE = "/pokemon.json"
     MOVES_FILE = "/move.json"
     TYPES_FILE = "/type.json"
@@ -444,12 +444,6 @@ func PrintWeaknessToDiscord(s *discordgo.Session, m *discordgo.MessageCreate, fi
 func init() {
     
     pokemonMap = make(map[string]Pokemon)
-    
-	_, filename, _, ok := runtime.Caller(1)
-	if !ok {
-	    return
-	}
-	JSON_LOCATION := path.Join(path.Dir(filename), "./json/")
     
     //Pokemon
     file, err := ioutil.ReadFile(JSON_LOCATION+POKEMON_FILE)
