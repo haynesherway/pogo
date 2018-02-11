@@ -6,15 +6,20 @@ import (
     "errors"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"path"
+	"runtime"
 	"sort"
 	"strings"
 )
 
+const POKE_API = "http://pokeapi.co/api/v2/"
+
 // Locations of the json files
-const (
-    POKEMON_FILE = "json/pokemon.json"
-    MOVES_FILE = "json/move.json"
-    TYPES_FILE = "json/type.json"
+var (
+    POKEMON_FILE = "/pokemon.json"
+    MOVES_FILE = "/move.json"
+    TYPES_FILE = "/type.json"
 )
 
 // Errors
@@ -33,6 +38,19 @@ type Pokemon struct {
     Stats       PokemonStats `json:"stats"`
     Moves
     MaxCP       int `json:"maxCP"`
+    TypeRelations
+    API
+}
+
+// Type API holds the pokemon data from the poke api
+type API struct {
+    url string
+    Sprites PokemonSprites `json:"sprites"`
+}
+
+// Type PokemonSprites is a representation of the sprites from poke api
+type PokemonSprites struct {
+    Front string `json:"front_default"`
 }
 
 // PokemonStats is a resource representing base stats for a pokemon
@@ -42,14 +60,43 @@ type PokemonStats struct {
     BaseDefense     int `json:"baseDefense"`
 }
 
+func (t TypeRelation) Print() string {
+    str := []string{}
+    for _, ty := range t {
+        str = append(str, ty)
+    }
+    return strings.Join(str, ", ")
+}
+
+func (t TypeRelation) Len() int {
+    ct := 0
+    for _, _ = range t {
+        ct++
+    }
+    return ct
+}
+
 // GetPokemon returns a Pokemon resource
 func GetPokemon(pokemonName string) (*Pokemon, error) {
     pokemonName = strings.ToLower(pokemonName)
     if p, ok := pokemonMap[pokemonName]; ok {
+        p.GetSprite()
+        p.GetTypeEffects()
         return &p, nil
     } else {
         return nil, ERR_NOT_FOUND
     }
+}
+
+func (p *Pokemon) GetSprite() {
+    if p.API.Sprites.Front == "" {
+         p.API.url = POKE_API + "pokemon/" + strings.ToLower(p.Name)
+         err := p.API.getSprite()
+         if err != nil {
+             fmt.Println(err.Error())
+         }
+    }
+    return
 }
 
 // GetMaxCP returns the maximum CP of a pokemon
@@ -71,17 +118,14 @@ func (p *Pokemon) GetRaidCPChart() (string) {
 
     //ivList := map[int]map[int]map[int]
     ivs := []ivStat{}
-    
-    str := fmt.Sprintf("CP Chart for **%s**:\n", p.Name)
-    str += "`|  %  | Ak | Df | St |  20  |  25  |`\n"
-    str += "`|----------------------------------|`\n"
+        
+    str := "[ % ]Ak|Df|St[ 20 | 25 ]\n"
+    str += "------------------------\n"
     for _, a := range possibleIVs {
         for _, d := range possibleIVs {
             for _, s := range possibleIVs {
                 percent := round(float64((a+d+s)*100)/float64(45))
-                if percent < 90 {
-                    continue
-                }
+
                 cp20 := p.GetCP(20.0, a, d, s)
                 cp25 := p.GetCP(25.0, a, d, s)
                 iv := ivStat{
@@ -111,7 +155,7 @@ func (p *Pokemon) GetRaidCPRange() (string) {
 	 max20 := p.GetCP(20.0, 15, 15, 15)
 	 min25 := p.GetCP(25.0, 10, 10, 10)
 	 max25 := p.GetCP(25.0, 15, 15, 15)
-     return fmt.Sprintf("__**CP For %s**__\nLevel 20: %v - **%v**\nLevel 25: %v - **%v**", p.Name, min20, max20, min25, max25)
+     return fmt.Sprintf("Level 20: %v - **%v**\nLevel 25: %v - **%v**", min20, max20, min25, max25)
 }
 
 func (p *Pokemon) GetIV(cp int, level float64, stardust int, best string) string {
@@ -213,18 +257,26 @@ func (p *Pokemon) GetRaidIV(raidcp int) (string) {
 
     ivList := []ivStat{}
     
-    message := fmt.Sprintf("Possible IVs for **%s** with CP of **%d**:\n", p.Name, raidcp)
+    //message := fmt.Sprintf("Possible IVs for **%s** with CP of **%d**:\n", p.Name, raidcp)
+    
+    message := "| At | Df | St | %%% | \n"
+    message += "|----|----|----|-----| \n"
     for _, a := range possibleIVs {
         for _, d := range possibleIVs {
             for _, s := range possibleIVs {
                 cp20 := p.GetCP(20.0, a, d, s)
                 cp25 := p.GetCP(25.0, a, d, s)
                 if raidcp == cp20 || raidcp == cp25 {
+                    lvl := 20.0
+                    if raidcp == cp25 {
+                        lvl = 25.0
+                    }
                     perc := round(float64((a+d+s)*100)/float64(45))
                     stat := ivStat{
                         Attack: a, 
                         Defense: d,
                         Stamina: s,
+                        Level: lvl,
                         //CP20: cp20,
                         //CP25: cp25,
                         Percent: perc,
@@ -242,7 +294,7 @@ func (p *Pokemon) GetRaidIV(raidcp int) (string) {
     ivList = SortChart(ivList)
     chart := []string{}
     for _, s := range ivList {
-       chart = append(chart, s.PrintIVRow())
+       chart = append(chart, s.PrintRaidIVRow())
     }
     
     return message + strings.Join(chart, "\n")
@@ -274,44 +326,49 @@ func (p *Pokemon) GetTypeRelations() (relations map[string]map[string]float64) {
     return
 }
     
-func (p *Pokemon) PrintTypeChart() string {
+func (p *Pokemon) GetTypeEffects() {
+        if p.SuperEffective.Len() != 0 {
+            return
+        }
+        
         typeRelations := p.GetTypeRelations()
         
-        superEffective := []string{}
-        notEffective := []string{}
-        weakness := []string{}
-        resistance := []string{}
+       //p.SuperEffective = []TypeRelation{}
+        //p.NotEffective = []TypeRelationstring{}
+        //p.Weakness = []TypeRelationstring{}
+        //p.Resistance = TypeRelation}
         
         //Attack
         for ty, sc := range typeRelations["attack"] {
             if sc > 1.9 {
-                superEffective = append(superEffective, ty + "(x2)")  
+                p.SuperEffective = append(p.SuperEffective, ty + "(x2)")  
             } else if sc >= 1.4 {
-                superEffective = append(superEffective, ty)
+                p.SuperEffective = append(p.SuperEffective, ty)
             } else if sc <= .6 {
-                notEffective = append(notEffective, ty + "(x2)")
+                p.NotEffective = append(p.NotEffective, ty + "(x2)")
             } else if sc <= .8 {
-                notEffective = append(notEffective, ty)
+                p.NotEffective = append(p.NotEffective, ty)
             }
         }
         
         //Defense 
         for ty, sc := range typeRelations["defense"] {
             if sc > 1.9 {
-                weakness = append(weakness, ty + "(x2)")
+                p.Weakness = append(p.Weakness, ty + "(x2)")
             } else if sc >= 1.4 {
-                weakness = append(weakness, ty)
+                p.Weakness = append(p.Weakness, ty)
             } else if sc <= .6 {
-                resistance = append(resistance, ty + "(x2)")
+                p.Resistance = append(p.Resistance, ty + "(x2)")
             } else if sc <= .8 {
-                resistance = append(resistance, ty)
+                p.Resistance = append(p.Resistance, ty)
             }
         }
-        
+
+        /*
         msg := fmt.Sprintf("Type Effects for **%s** (%s):\n", p.Name, p.Types.Print())
         /*if len(doubleEffective) > 0 {
             msg += fmt.Sprintf("Double Effective Against: %s\n", strings.Join(doubleEffective, ", "))
-        }*/
+        }
         if len(superEffective) > 0 {
             msg += fmt.Sprintf("Super Effective Against: %s\n", strings.Join(superEffective, ", "))
         }
@@ -323,9 +380,9 @@ func (p *Pokemon) PrintTypeChart() string {
         }
         if len(resistance) > 0 {
             msg += fmt.Sprintf("Resistant To: %s\n", strings.Join(resistance, ", "))
-        }
+        }*/
         
-        return msg
+        return 
     }
     
    /* for _, pt := range Pokemon.Types {
@@ -385,10 +442,17 @@ func PrintWeaknessToDiscord(s *discordgo.Session, m *discordgo.MessageCreate, fi
 } */
 
 func init() {
+    
     pokemonMap = make(map[string]Pokemon)
     
+	_, filename, _, ok := runtime.Caller(1)
+	if !ok {
+	    return
+	}
+	JSON_LOCATION := path.Join(path.Dir(filename), "./json/")
+    
     //Pokemon
-    file, err := ioutil.ReadFile(POKEMON_FILE)
+    file, err := ioutil.ReadFile(JSON_LOCATION+POKEMON_FILE)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -406,4 +470,28 @@ func init() {
 	}
 	
     return
+}
+
+func (p *API) getSprite() error{
+    resp, err := http.Get(p.url)
+    if err != nil {
+    	return err
+    }
+    defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(resp.Status)
+	}
+	
+	responseData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(responseData, p)
+	if err != nil {
+		return err
+	}
+	
+	return nil
 }

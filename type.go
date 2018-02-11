@@ -2,18 +2,27 @@ package pogo
 
 import (
     "encoding/json"
+    "errors"
     "fmt"
     "io/ioutil"
+    "path"
+    "runtime"
     "strings"
 )
 
 var typeMap = map[string]Type{}
 var typeToID = map[string]string{}
 
+var (
+    ERR_TYPE_NOT_FOUND = errors.New("Type not found.")
+)
+
 type Type struct {
     ID      string `json:"id"`
     Name    string `json:"name"`
     Damage []*TypeDamage `json:"damage"`
+    Thumbnail string
+    TypeRelations
 }
 
 type TypeList []*PokemonType
@@ -28,6 +37,25 @@ type TypeDamage struct {
     Scalar float64 `json:"attackScalar"`
 }
 
+type TypeRelations struct {
+    SuperEffective TypeRelation
+    NotEffective TypeRelation
+    Weakness TypeRelation
+    Resistance TypeRelation
+}
+
+type TypeRelation []string
+
+func GetType(t string) (*Type, error) {
+    t = strings.ToLower(t)
+    if ty, ok := typeMap[typeToID[t]]; ok {
+        ty.GetTypeEffects()
+        return &ty, nil
+    } else {
+        return &Type{}, ERR_TYPE_NOT_FOUND
+    }
+}
+
 func (typeList TypeList) Print() string {
     types := []string{}
     for _, t := range typeList {
@@ -35,57 +63,42 @@ func (typeList TypeList) Print() string {
     }
     return strings.Join(types, ", ")
 }
-func (t *Type) PrintTypeChart() string {
+func (t *Type) GetTypeEffects() {
+        if t.SuperEffective.Len() != 0 {
+            return
+        }
+    
         typeRelations := make(map[string]map[string]float64)
         typeRelations["attack"] = GetAttackTypeScalars(t.ID)
         typeRelations["defense"] = GetDefenseTypeScalars(t.ID)
         
-        superEffective := []string{}
-        notEffective := []string{}
-        weakness := []string{}
-        resistance := []string{}
-        
         //Attack
         for ty, sc := range typeRelations["attack"] {
              if sc > 1.9 {
-                superEffective = append(superEffective, ty + "(x2)")  
+                t.SuperEffective = append(t.SuperEffective, ty + "(x2)")  
             } else if sc >= 1.4 {
-                superEffective = append(superEffective, ty)
+                t.SuperEffective = append(t.SuperEffective, ty)
             } else if sc <= .6 {
-                notEffective = append(notEffective, ty + "(x2)")
+                t.NotEffective = append(t.NotEffective, ty + "(x2)")
             } else if sc <= .8 {
-                notEffective = append(notEffective, ty)
+                t.NotEffective = append(t.NotEffective, ty)
             }
         }
         
         //Defense 
         for ty, sc := range typeRelations["defense"] {
            if sc > 1.9 {
-                weakness = append(weakness, ty + "(x2)")
+                t.Weakness = append(t.Weakness, ty + "(x2)")
             } else if sc >= 1.4 {
-                weakness = append(weakness, ty)
+                t.Weakness = append(t.Weakness, ty)
             } else if sc <= .6 {
-                resistance = append(resistance, ty + "(x2)")
+                t.Resistance = append(t.Resistance, ty + "(x2)")
             } else if sc <= .8 {
-                resistance = append(resistance, ty)
+                t.Resistance = append(t.Resistance, ty)
             }
         }
-        
-        msg := fmt.Sprintf("Type Effects for **%s**:\n", t.Name)
-        if len(superEffective) > 0 {
-            msg += fmt.Sprintf("Super Effective Against: %s\n", strings.Join(superEffective, ", "))
-        }
-        if len(notEffective) > 0 {
-            msg += fmt.Sprintf("Not Very Effective Against: %s\n", strings.Join(notEffective, ", "))
-        }
-        if len(weakness) > 0 {
-            msg += fmt.Sprintf("Weak To: %s\n", strings.Join(weakness, ", "))
-        }
-        if len(resistance) > 0 {
-            msg += fmt.Sprintf("Resistant To: %s\n", strings.Join(resistance, ", "))
-        }
-        
-        return msg
+    
+        return
     }
 
 func GetAttackTypeScalars(id string) (map[string]float64) {
@@ -120,8 +133,14 @@ func GetDefenseTypeScalars(id string) (map[string]float64) {
 func init() {
     typeMap = make(map[string]Type)
     
+    _, filename, _, ok := runtime.Caller(1)
+	if !ok {
+	    return
+	}
+	JSON_LOCATION := path.Join(path.Dir(filename), "./json/")
+    
     //Types
-	file, err := ioutil.ReadFile(TYPES_FILE)
+	file, err := ioutil.ReadFile(JSON_LOCATION+TYPES_FILE)
 	if err != nil {
 	    fmt.Println(err.Error())
 	    return
@@ -135,6 +154,8 @@ func init() {
 	}
 	
 	for _, ty := range typeList {
+	    ty.Thumbnail = "https://github.com/haynesherway/pogo/blob/master/pics/"+strings.ToLower(ty.Name)+".png?raw=true"
+	    //ty.Thumbnail = "https://github.com/PokeAPI/sprites/blob/master/sprites/items/"+strings.ToLower(ty.Name)+"-gem.png?raw=true"
 	    typeMap[ty.ID] = ty
 	    typeToID[strings.ToLower(ty.Name)] = ty.ID
 	}

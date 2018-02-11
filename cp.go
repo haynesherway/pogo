@@ -196,9 +196,16 @@ func SortChart(stats []ivStat) []ivStat {
 
 func (s *ivStat) PrintChartRow() string {
 	if s.Percent == 100 {
-		return fmt.Sprintf("`| %d | %d | %d | %d | %d | %d |`", s.Percent, s.Attack, s.Defense, s.Stamina, s.CP20, s.CP25)
+		return fmt.Sprintf("[%d]%d|%d|%d[%4d|%4d]", s.Percent, s.Attack, s.Defense, s.Stamina, s.CP20, s.CP25)
 	}
-	return fmt.Sprintf("`| %d%% | %d | %d | %d | %d | %d |`", s.Percent, s.Attack, s.Defense, s.Stamina, s.CP20, s.CP25)
+	return fmt.Sprintf("[%3d]%d|%d|%d[%4d|%4d]", s.Percent, s.Attack, s.Defense, s.Stamina, s.CP20, s.CP25)
+}
+
+func (s *ivStat) PrintRaidIVRow() string {
+	if s.Percent == 100 {
+		return fmt.Sprintf("| %2d | %2d | %2d [ %d ]", s.Attack, s.Defense, s.Stamina, s.Percent)
+	}
+	return fmt.Sprintf("| %2d | %2d | %2d [ %d%% ]", s.Attack, s.Defense, s.Stamina, s.Percent)
 }
 
 func (s *ivStat) PrintIVRow() string {
