@@ -32,7 +32,7 @@ type IVCalculation struct {
     User *discordgo.User
     ChannelID string
     Pokemon *Pokemon
-    IV  *ivStat
+    IV  *IVStat
     Channel chan interface{}
     Status int
 }
