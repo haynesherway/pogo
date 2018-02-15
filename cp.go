@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-type ivStat struct {
+type IVStat struct {
 	Stardust int
 	Attack int
 	Defense int
@@ -140,9 +140,9 @@ func calculateCP(attack float64, defense float64, stamina float64, level float64
 	return
 }
 
-type by func(s1, s2 *ivStat) bool
+type by func(s1, s2 *IVStat) bool
 
-func (by by) Sort(stats []ivStat) {
+func (by by) Sort(stats []IVStat) {
 	ss := &statSorter{
 		stats: stats,
 		by: by,
@@ -151,8 +151,8 @@ func (by by) Sort(stats []ivStat) {
 }
 
 type statSorter struct {
-	stats	[]ivStat
-	by 	func(s1, s2 *ivStat) bool
+	stats	[]IVStat
+	by 	func(s1, s2 *IVStat) bool
 }
 
 func (s *statSorter) Len() int {
@@ -167,8 +167,8 @@ func (s *statSorter) Less(i, j int) bool {
 	return s.by(&s.stats[i], &s.stats[j])
 }
 
-func SortChart(stats []ivStat) []ivStat {
-	sort := func(s1, s2 *ivStat) bool {
+func SortChart(stats []IVStat) []IVStat {
+	sort := func(s1, s2 *IVStat) bool {
 		if s1.Level == s2.Level {
 			if s1.CP25 == s2.CP25 {
 				if s1.CP20 == s2.CP20 {
@@ -194,21 +194,21 @@ func SortChart(stats []ivStat) []ivStat {
 	return stats
 }
 
-func (s *ivStat) PrintChartRow() string {
+func (s *IVStat) PrintChartRow() string {
 	if s.Percent == 100 {
 		return fmt.Sprintf("[%d]%d|%d|%d[%4d|%4d]", s.Percent, s.Attack, s.Defense, s.Stamina, s.CP20, s.CP25)
 	}
 	return fmt.Sprintf("[%3d]%d|%d|%d[%4d|%4d]", s.Percent, s.Attack, s.Defense, s.Stamina, s.CP20, s.CP25)
 }
 
-func (s *ivStat) PrintRaidIVRow() string {
+func (s *IVStat) PrintRaidIVRow() string {
 	if s.Percent == 100 {
 		return fmt.Sprintf("| %2d | %2d | %2d [ %d ]", s.Attack, s.Defense, s.Stamina, s.Percent)
 	}
 	return fmt.Sprintf("| %2d | %2d | %2d [ %d%% ]", s.Attack, s.Defense, s.Stamina, s.Percent)
 }
 
-func (s *ivStat) PrintIVRow() string {
+func (s *IVStat) PrintIVRow() string {
 	return fmt.Sprintf("`%4.1f | %2d | %2d | %2d ---> %d%%`", s.Level, s.Attack, s.Defense, s.Stamina, s.Percent)
 }
 

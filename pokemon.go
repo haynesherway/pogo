@@ -113,11 +113,11 @@ func (p *Pokemon) GetCP(level float64, ivAttack int, ivDefense int, ivStamina in
     return
 }
 
-func (p *Pokemon) GetRaidCPChart() (string) {
+func (p *Pokemon) GetRaidCPChart() ([]IVStat, string) {
     possibleIVs := []int{15,14,13,12,11,10}
 
     //ivList := map[int]map[int]map[int]
-    ivs := []ivStat{}
+    ivs := []IVStat{}
         
     str := "[ % ]Ak|Df|St[ 20 | 25 ]\n"
     str += "------------------------\n"
@@ -128,7 +128,7 @@ func (p *Pokemon) GetRaidCPChart() (string) {
 
                 cp20 := p.GetCP(20.0, a, d, s)
                 cp25 := p.GetCP(25.0, a, d, s)
-                iv := ivStat{
+                iv := IVStat{
                     Attack: a,
                     Defense: d,
                     Stamina: s,
@@ -147,7 +147,7 @@ func (p *Pokemon) GetRaidCPChart() (string) {
         chart = append(chart, iv.PrintChartRow())
     }
     
-    return str + strings.Join(chart, "\n")
+    return ivs, str + strings.Join(chart, "\n")
 }
 
 func (p *Pokemon) GetRaidCPRange() (string) {
@@ -159,16 +159,16 @@ func (p *Pokemon) GetRaidCPRange() (string) {
 }
 
 func (p *Pokemon) GetIV(cp int, level float64, stardust int, best string) string {
-    ivstat := &ivStat{
+    IVStat := &IVStat{
         Level: level,
         CP: cp,
         Stardust: stardust,
         Best: best,
     }
-    return p.getIV(ivstat)
+    return p.getIV(IVStat)
 }
 
-func (p *Pokemon) getIV(stats *ivStat) (string) {
+func (p *Pokemon) getIV(stats *IVStat) (string) {
     possibleIVs := []int{15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0}
     
     possibleLevels := []float64{}
@@ -189,7 +189,7 @@ func (p *Pokemon) getIV(stats *ivStat) (string) {
     }
     cp := stats.CP
     
-    ivList := []ivStat{}
+    ivList := []IVStat{}
     
     message := fmt.Sprintf("Possible IVs for **%s** with CP of **%d**:\n", p.Name, cp)
     for _, l := range possibleLevels {
@@ -218,7 +218,7 @@ func (p *Pokemon) getIV(stats *ivStat) (string) {
                     }
                     if cp == calccp {
                         perc := round(float64((a+d+s)*100)/float64(45))
-                        stat := ivStat{
+                        stat := IVStat{
                             Level: l,
                             Attack: a, 
                             Defense: d,
@@ -252,10 +252,10 @@ func (p *Pokemon) getIV(stats *ivStat) (string) {
     return message + strings.Join(chart, "\n") + afterMessage
 }
 
-func (p *Pokemon) GetRaidIV(raidcp int) (string) {
+func (p *Pokemon) GetRaidIV(raidcp int) ([]IVStat, string) {
     possibleIVs := []int{15,14,13,12,11,10}
 
-    ivList := []ivStat{}
+    ivList := []IVStat{}
     
     //message := fmt.Sprintf("Possible IVs for **%s** with CP of **%d**:\n", p.Name, raidcp)
     
@@ -272,7 +272,7 @@ func (p *Pokemon) GetRaidIV(raidcp int) (string) {
                         lvl = 25.0
                     }
                     perc := round(float64((a+d+s)*100)/float64(45))
-                    stat := ivStat{
+                    stat := IVStat{
                         Attack: a, 
                         Defense: d,
                         Stamina: s,
@@ -288,7 +288,7 @@ func (p *Pokemon) GetRaidIV(raidcp int) (string) {
     }
     
     if ivList == nil || len(ivList) == 0  {
-        return ""
+        return ivList, ""
     }
     
     ivList = SortChart(ivList)
@@ -297,7 +297,7 @@ func (p *Pokemon) GetRaidIV(raidcp int) (string) {
        chart = append(chart, s.PrintRaidIVRow())
     }
     
-    return message + strings.Join(chart, "\n")
+    return ivList, message + strings.Join(chart, "\n")
 }
 
 func (p *Pokemon) GetTypeRelations() (relations map[string]map[string]float64) {
