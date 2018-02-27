@@ -9,6 +9,7 @@ import (
 	"net/http"
     "os"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -28,6 +29,7 @@ var (
 )
 
 var pokemonMap map[string]Pokemon
+var dexMap map[int]string
 
 // Pokemon is a resource representing a single pokemon
 type Pokemon struct {
@@ -78,6 +80,13 @@ func (t TypeRelation) Len() int {
 
 // GetPokemon returns a Pokemon resource
 func GetPokemon(pokemonName string) (*Pokemon, error) {
+    // Check if a dex number was sent
+    if dex, err := strconv.Atoi(pokemonName); err == nil {
+        if pk, ok := dexMap[dex]; ok {
+            pokemonName = pk
+        }
+    }
+    
     pokemonName = strings.ToLower(pokemonName)
     if p, ok := pokemonMap[pokemonName]; ok {
         p.GetSprite()
@@ -86,6 +95,11 @@ func GetPokemon(pokemonName string) (*Pokemon, error) {
     } else {
         return nil, ERR_NOT_FOUND
     }
+}
+
+// GetPokemonByNumber returns a Pokemon resource based on pokedex number
+func GetPokemonByNumber(dex int) (*Pokemon, error) {
+    return GetPokemon(dexMap[dex])
 }
 
 func (p *Pokemon) GetSprite() {
@@ -444,6 +458,7 @@ func PrintWeaknessToDiscord(s *discordgo.Session, m *discordgo.MessageCreate, fi
 func init() {
     
     pokemonMap = make(map[string]Pokemon)
+    dexMap = make(map[int]string)
     
     //Pokemon
     file, err := ioutil.ReadFile(JSON_LOCATION+POKEMON_FILE)
@@ -461,6 +476,7 @@ func init() {
 	
 	for _, poke := range pokemonList {
 	    pokemonMap[strings.ToLower(poke.Name)] = poke
+	    dexMap[poke.Dex] = strings.ToLower(poke.Name)
 	}
 	
     return
