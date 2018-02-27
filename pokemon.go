@@ -97,11 +97,6 @@ func GetPokemon(pokemonName string) (*Pokemon, error) {
     }
 }
 
-// GetPokemonByNumber returns a Pokemon resource based on pokedex number
-func GetPokemonByNumber(dex int) (*Pokemon, error) {
-    return GetPokemon(dexMap[dex])
-}
-
 func (p *Pokemon) GetSprite() {
     if p.API.Sprites.Front == "" {
          p.API.url = POKE_API + "pokemon/" + strings.ToLower(p.Name)
@@ -172,7 +167,7 @@ func (p *Pokemon) GetRaidCPRange() (string) {
      return fmt.Sprintf("Level 20: %v - **%v**\nLevel 25: %v - **%v**", min20, max20, min25, max25)
 }
 
-func (p *Pokemon) GetIV(cp int, level float64, stardust int, best string) string {
+func (p *Pokemon) GetIV(cp int, level float64, stardust int, best string) ([]IVStat, string) {
     IVStat := &IVStat{
         Level: level,
         CP: cp,
@@ -182,7 +177,7 @@ func (p *Pokemon) GetIV(cp int, level float64, stardust int, best string) string
     return p.getIV(IVStat)
 }
 
-func (p *Pokemon) getIV(stats *IVStat) (string) {
+func (p *Pokemon) getIV(stats *IVStat) ([]IVStat, string) {
     possibleIVs := []int{15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0}
     
     possibleLevels := []float64{}
@@ -205,7 +200,9 @@ func (p *Pokemon) getIV(stats *IVStat) (string) {
     
     ivList := []IVStat{}
     
-    message := fmt.Sprintf("Possible IVs for **%s** with CP of **%d**:\n", p.Name, cp)
+    message := "| Lvl  | At | Df | St | %%% | \n"
+    message += "|------|----|----|----|-----| \n"
+    
     for _, l := range possibleLevels {
         for _, a := range possibleIVs {
             for _, d := range possibleIVs {
@@ -249,21 +246,22 @@ func (p *Pokemon) getIV(stats *IVStat) (string) {
     }
     
     if ivList == nil || len(ivList) == 0  {
-        return ""
+        return nil, ""
     }
     
-    afterMessage := ""
     ivList = SortChart(ivList)
     chart := []string{}
-    if len(ivList) > 50 {
+    /*if len(ivList) > 50 {
         ivList = ivList[0:50]
-        afterMessage = "\nFull Chart too long to display, refine results by adding more info if possible :("
-    }
-    for _, s := range ivList {
+    }*/
+    for i, s := range ivList {
+        if i >= 30 {
+           break
+       }
        chart = append(chart, s.PrintIVRow())
     }
     
-    return message + strings.Join(chart, "\n") + afterMessage
+    return ivList, message + strings.Join(chart, "\n")
 }
 
 func (p *Pokemon) GetRaidIV(raidcp int) ([]IVStat, string) {

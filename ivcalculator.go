@@ -180,7 +180,7 @@ func (ivCalc *IVCalculation) GetResponse(m string) {
 }
 
 func (ivCalc *IVCalculation) Calculate() {
-    msg := ivCalc.Pokemon.getIV(ivCalc.IV)
+    _, msg := ivCalc.Pokemon.getIV(ivCalc.IV)
     ivCalc.PrintToDiscord(msg)
     ivCalc.Status++
 }
