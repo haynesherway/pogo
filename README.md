@@ -1,4 +1,4 @@
-[![GoDoc](http://godoc.org/github.com/haynesherway/pogo?status.svg)](http://godoc.org/github.com/haynesherway/pogo)
+[![GoDoc](http://godoc.org/github.com/haynesherway/pogo?status.svg)](http://godoc.org/github.com/haynesherway/pogo) [![Build Status](https://travis-ci.org/haynesherway/pogo.svg?branch=master)](https://travis-ci.org/haynesherway/pogo)
 
 # Installation
 >go get github.com/haynesherway/pogo
