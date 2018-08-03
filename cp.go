@@ -13,6 +13,7 @@ type IVStat struct {
 	Stamina int
 	Percent int
 	CP int
+	CP15 int
 	CP20 int
 	CP25 int
 	Level float64
@@ -172,16 +173,19 @@ func SortChart(stats []IVStat) []IVStat {
 		if s1.Level == s2.Level {
 			if s1.CP25 == s2.CP25 {
 				if s1.CP20 == s2.CP20 {
-					if s1.Percent == s2.Percent {
-						if s1.Attack == s2.Attack {
-							if s1.Defense == s2.Defense {
-								return s1.Stamina > s2.Stamina
+					if s1.CP15 == s2.CP15 {
+						if s1.Percent == s2.Percent {
+							if s1.Attack == s2.Attack {
+								if s1.Defense == s2.Defense {
+									return s1.Stamina > s2.Stamina
+								}
+								return s1.Defense > s2.Defense
 							}
-							return s1.Defense > s2.Defense
+							return s1.Attack > s2.Attack
 						}
-						return s1.Attack > s2.Attack
+						return s1.Percent > s2.Percent
 					}
-					return s1.Percent > s2.Percent
+					return s1.CP15 > s2.CP15
 				}
 				return s1.CP20 > s2.CP20
 			}

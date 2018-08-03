@@ -81,6 +81,7 @@ func (t TypeRelation) Len() int {
 // GetPokemon returns a Pokemon resource
 func GetPokemon(pokemonName string) (*Pokemon, error) {
     // Check if a dex number was sent
+    pokemonName =  strings.Replace(pokemonName, "-", " ", 1)
     if dex, err := strconv.Atoi(pokemonName); err == nil {
         if pk, ok := dexMap[dex]; ok {
             pokemonName = pk
@@ -135,12 +136,14 @@ func (p *Pokemon) GetRaidCPChart() ([]IVStat, string) {
             for _, s := range possibleIVs {
                 percent := round(float64((a+d+s)*100)/float64(45))
 
+		cp15 := p.GetCP(15.0, a, d, s)
                 cp20 := p.GetCP(20.0, a, d, s)
                 cp25 := p.GetCP(25.0, a, d, s)
                 iv := IVStat{
                     Attack: a,
                     Defense: d,
                     Stamina: s,
+		    CP15: cp15,
                     CP20: cp20,
                     CP25: cp25,
                     Percent: percent,
@@ -276,13 +279,16 @@ func (p *Pokemon) GetRaidIV(raidcp int) ([]IVStat, string) {
     for _, a := range possibleIVs {
         for _, d := range possibleIVs {
             for _, s := range possibleIVs {
-                cp20 := p.GetCP(20.0, a, d, s)
+		cp15 := p.GetCP(15.0, a, d, s)
+		cp20 := p.GetCP(20.0, a, d, s)
                 cp25 := p.GetCP(25.0, a, d, s)
-                if raidcp == cp20 || raidcp == cp25 {
+                if raidcp == cp20 || raidcp == cp25 || raidcp == cp15 {
                     lvl := 20.0
                     if raidcp == cp25 {
                         lvl = 25.0
-                    }
+                    } else if raidcp == cp15 {
+		    	lvl = 15.0
+		    }
                     perc := round(float64((a+d+s)*100)/float64(45))
                     stat := IVStat{
                         Attack: a, 
