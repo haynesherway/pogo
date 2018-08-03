@@ -16,6 +16,7 @@ type IVStat struct {
 	CP15 int
 	CP20 int
 	CP25 int
+	HP int
 	Level float64
 	Best string
 }
@@ -137,6 +138,16 @@ func calculateCP(attack float64, defense float64, stamina float64, level float64
 	}
 	if cp < 10 {
 	    cp = 10
+	}
+	return
+}
+
+func calculateHP(stamina float64, level float64) (hp int) {
+	if multiplier, ok := multiplierMap[level]; ok {
+		hp = int(stamina * multiplier)
+	}
+	if hp < 10 {
+		hp = 10
 	}
 	return
 }

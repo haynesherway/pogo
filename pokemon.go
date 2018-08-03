@@ -123,6 +123,12 @@ func (p *Pokemon) GetCP(level float64, ivAttack int, ivDefense int, ivStamina in
     return
 }
 
+func (p *Pokemon) GetHP(level float64, ivStamina int) (hp int) {
+    stamina := getStatValue(p.Stats.BaseStamina, ivStamina, level)
+    hp = calculateHP(stamina, level)
+    return
+}
+
 func (p *Pokemon) GetRaidCPChart() ([]IVStat, string) {
     possibleIVs := []int{15,14,13,12,11,10}
 
@@ -170,10 +176,11 @@ func (p *Pokemon) GetRaidCPRange() (string) {
      return fmt.Sprintf("Level 20: %v - **%v**\nLevel 25: %v - **%v**", min20, max20, min25, max25)
 }
 
-func (p *Pokemon) GetIV(cp int, level float64, stardust int, best string) ([]IVStat, string) {
+func (p *Pokemon) GetIV(cp int, hp int, level float64, stardust int, best string) ([]IVStat, string) {
     IVStat := &IVStat{
         Level: level,
         CP: cp,
+        HP: hp,
         Stardust: stardust,
         Best: best,
     }
@@ -200,6 +207,7 @@ func (p *Pokemon) getIV(stats *IVStat) ([]IVStat, string) {
         }
     }
     cp := stats.CP
+    hp := stats.HP
     
     ivList := []IVStat{}
     
@@ -211,6 +219,7 @@ func (p *Pokemon) getIV(stats *IVStat) ([]IVStat, string) {
             for _, d := range possibleIVs {
                 for _, s := range possibleIVs {
                     calccp := p.GetCP(l, a, d, s)
+                    calchp := p.GetHP(l, s)
                     
                     if stats.Best != "" {
                         beststr := ""
@@ -230,7 +239,7 @@ func (p *Pokemon) getIV(stats *IVStat) ([]IVStat, string) {
                             continue
                         }
                     }
-                    if cp == calccp {
+                    if cp == calccp && hp == calchp {
                         perc := round(float64((a+d+s)*100)/float64(45))
                         stat := IVStat{
                             Level: l,
