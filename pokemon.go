@@ -585,6 +585,11 @@ func init() {
 	}
 
 	for _, poke := range pokemonList {
+
+		if strings.Contains(strings.ToUpper(poke.ID), "PURIFIED") || strings.Contains(strings.ToUpper(poke.ID), "SHADOW") {
+			continue
+		}
+
 		pokeID := strings.Replace(strings.ToLower(poke.ID), "_", "-", -1)
 		poke.ID = pokeID
 		pokemonMap[pokeID] = poke
@@ -668,7 +673,11 @@ func init() {
 	}
 
 	for id, pokemon := range pokemonMap {
-		_, err := writeFile.WriteString(fmt.Sprintf("%v,%s,%s\n", pokemon.Dex, pokemon.Name, id))
+		img := ""
+		if err := pokemon.getNormal(); err != nil {
+			img = "No image found"
+		}
+		_, err := writeFile.WriteString(fmt.Sprintf("%v,%s,%s,%s\n", pokemon.Dex, pokemon.Name, id, img))
 		if err != nil {
 			fmt.Println(err)
 		}
