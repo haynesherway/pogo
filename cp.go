@@ -224,7 +224,7 @@ func (s *IVStat) PrintRaidIVRow() string {
 }
 
 func (s *IVStat) PrintIVRow() string {
-	return fmt.Sprintf("| %4.1f | %2d | %2d | %2d [ %d%% ]", s.Level, s.Attack, s.Defense, s.Stamina, s.Percent)
+	return fmt.Sprintf("|%4.1f| %2d | %2d | %2d [%d%%]  ", s.Level, s.Attack, s.Defense, s.Stamina, s.Percent)
 }
 
 func round(f float64) int {

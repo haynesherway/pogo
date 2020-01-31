@@ -58,6 +58,7 @@ var pokemonAliases = map[string]string{
 	"shellos-west-sea": "shellos-west%s",
 	"-normal":          "%s",
 	"deoxys-":          "%s-deoxys",
+	"galarian-":        "%s-galarian",
 }
 
 type Icons struct {
@@ -88,9 +89,10 @@ func (f FormList) Len() int {
 
 // PokemonForm is a resourse representing a pokemon form
 type PokemonForm struct {
-	ID               string `json:"id"`
-	Name             string `json:"name"`
-	AssetBundleValue int    `json:"assetBundleValue"`
+	ID                string `json:"id"`
+	Name              string `json:"name"`
+	AssetBundleValue  int    `json:"assetBundleValue"`
+	AssetBundleSuffix string `json:"assetBundleSuffix"`
 	Pokemon
 }
 
@@ -272,8 +274,8 @@ func (p *Pokemon) getIV(stats *IVStat) ([]IVStat, string) {
 
 	ivList := []IVStat{}
 
-	message := "| Lvl  | At | Df | St | %%% | \n"
-	message += "|------|----|----|----|-----| \n"
+	message := "|Lvl | At | Df | St |%%%|   \n"
+	message += "|----|----|----|----|---|   \n"
 
 	for _, l := range possibleLevels {
 		for _, a := range possibleIVs {
@@ -654,7 +656,13 @@ func init() {
 				if !ImageExists(fmt.Sprintf("%s.png", formID)) {
 					// Try to get from pogo assets
 					f := form.AssetBundleValue
-					oldImage := fmt.Sprintf("pokemon_icon_%03d_%02d.png", poke.Dex, f)
+					suffix := form.AssetBundleSuffix
+					oldImage := ""
+					if suffix == "" {
+						oldImage = fmt.Sprintf("pokemon_icon_%03d_%02d.png", poke.Dex, f)
+					} else {
+						oldImage = fmt.Sprintf("pokemon_icon%s.png", suffix)
+					}
 					newImage := fmt.Sprintf("%s.png", formID)
 					if AssetsImageExists(oldImage) {
 						LinkFromAssets(oldImage, newImage)
@@ -662,7 +670,13 @@ func init() {
 				}
 				if !ImageExists(fmt.Sprintf("%s-shiny.png", formID)) {
 					f := form.AssetBundleValue
-					oldImage := fmt.Sprintf("pokemon_icon_%03d_%02d_shiny.png", poke.Dex, f)
+					suffix := form.AssetBundleSuffix
+					oldImage := ""
+					if suffix == "" {
+						oldImage = fmt.Sprintf("pokemon_icon_%03d_%02d_shiny.png", poke.Dex, f)
+					} else {
+						oldImage = fmt.Sprintf("pokemon_icon%s_shiny.png", suffix)
+					}
 					newImage := fmt.Sprintf("%s-shiny.png", formID)
 					if AssetsImageExists(oldImage) {
 						LinkFromAssets(oldImage, newImage)

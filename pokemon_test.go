@@ -7,7 +7,7 @@ import (
 
 type testMon struct {
 	input string
-	name string
+	name  string
 	maxcp int
 }
 
@@ -23,16 +23,16 @@ func TestGetPokemon(t *testing.T) {
 		p, err := GetPokemon(pokemon.input)
 		if err != nil {
 			t.Error(
-			"For", pokemon.input,
-			"expected", pokemon.name,
-			"got", err.Error())
+				"For", pokemon.input,
+				"expected", pokemon.name,
+				"got", err.Error())
 			return
 		}
 		if pokemon.name != p.Name {
 			t.Error(
-			"For", pokemon.input,
-			"expected", pokemon.name,
-			"got", p.Name)
+				"For", pokemon.input,
+				"expected", pokemon.name,
+				"got", p.Name)
 		}
 	}
 }
@@ -65,9 +65,9 @@ func TestPokemon_GetMaxCP(t *testing.T) {
 		maxcp := p.GetMaxCP()
 		if maxcp != pokemon.maxcp {
 			t.Error(
-			"For", pokemon.input,
-			"expected", pokemon.maxcp,
-			"got", maxcp)
+				"For", pokemon.input,
+				"expected", pokemon.maxcp,
+				"got", maxcp)
 		}
 	}
 }
